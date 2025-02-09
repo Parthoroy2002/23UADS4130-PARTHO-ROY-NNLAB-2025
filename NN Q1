@@ -1,0 +1,72 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+class Perceptron:
+    def __init__(self, input_size, learning_rate=0.1, epochs=100):
+        self.learning_rate = learning_rate
+        self.epochs = epochs
+        self.weights = np.random.rand(input_size + 1)  # Including bias weight
+        self.loss_history = []  # Store loss values
+    
+    def activation(self, x):
+        return 1 if x >= 0 else 0
+    
+    def predict(self, x):
+        x = np.insert(x, 0, 1)  # Adding bias input
+        return self.activation(np.dot(self.weights, x))
+    
+    def train(self, X, y):
+        for _ in range(self.epochs):
+            total_error = 0
+            for i in range(len(X)):
+                x_i = np.insert(X[i], 0, 1)  # Adding bias input
+                y_pred = self.activation(np.dot(self.weights, x_i))
+                error = y[i] - y_pred
+                total_error += abs(error)
+                self.weights += self.learning_rate * error * x_i
+            self.loss_history.append(total_error)
+    
+    def evaluate(self, X, y):
+        correct = sum(self.predict(x) == y_i for x, y_i in zip(X, y))
+        return correct / len(y)
+    
+    def plot_loss_curve(self):
+        plt.plot(self.loss_history)
+        plt.xlabel('Epochs')
+        plt.ylabel('Total Error')
+        plt.title('Loss Curve')
+        plt.show()
+    
+    def get_confusion_matrix(self, X, y):
+        y_pred = [self.predict(x) for x in X]
+        cm = confusion_matrix(y, y_pred)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+        disp.plot()
+        plt.show()
+
+
+# Python Implementation
+# NAND truth table
+X_nand = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y_nand = np.array([1, 1, 1, 0])
+
+# XOR truth table
+X_xor = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y_xor = np.array([0, 1, 1, 0])
+
+# Train Perceptron for NAND
+t_nand = Perceptron(input_size=2)
+t_nand.train(X_nand, y_nand)
+nand_accuracy = t_nand.evaluate(X_nand, y_nand)
+print("NAND Perceptron Accuracy:", nand_accuracy)
+t_nand.plot_loss_curve()
+t_nand.get_confusion_matrix(X_nand, y_nand)
+
+# Train Perceptron for XOR
+t_xor = Perceptron(input_size=2)
+t_xor.train(X_xor, y_xor)
+xor_accuracy = t_xor.evaluate(X_xor, y_xor)
+print("XOR Perceptron Accuracy:", xor_accuracy)
+t_xor.plot_loss_curve()
+t_xor.get_confusion_matrix(X_xor, y_xor)

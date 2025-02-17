@@ -77,3 +77,7 @@ xor_accuracy = t_xor.evaluate(X_xor, y_xor)
 print("XOR Perceptron Accuracy:", xor_accuracy)
 t_xor.plot_loss_curve()
 t_xor.get_confusion_matrix(X_xor, y_xor)
+
+output:-
+NAND Perceptron Accuracy: 1.0
+XOR Perceptron Accuracy: ~0.5 (varies)
